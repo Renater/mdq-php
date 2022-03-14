@@ -10,20 +10,20 @@ global $logger;
 //    * If not provided, must must provide all the entities (ie MD file)
 //    * Check accept is "application/samlmetadata+xml"
 if ($_SERVER['REQUEST_METHOD'] != 'GET') {
-    $logger->addError("Non GET method");
+    $logger->error("Non GET method");
 
     http_response_code(405);
     exit("Non supported method");
 }
 if ($_SERVER['HTTP_ACCEPT'] != "application/samlmetadata+xml") {
-    $logger->addError("Unsupported accept value: ".$_SERVER['HTTP_ACCEPT']);
+    $logger->error("Unsupported accept value: ".$_SERVER['HTTP_ACCEPT']);
     http_response_code(406);
     exit("Unsupported accept value: ".$_SERVER['HTTP_ACCEPT']);
 }
 
 // 2- Decode entityID
 
-$logger->addDebug("Path Info = ".$_SERVER['PATH_INFO']);
+$logger->debug("Path Info = ".$_SERVER['PATH_INFO']);
 if (!isset($_SERVER['PATH_INFO']) || !startsWith($_SERVER['PATH_INFO'], "/entities")) {
     http_response_code(400);
     exit('Bad request');
@@ -36,9 +36,9 @@ if (endsWith($_SERVER['PATH_INFO'], "/entities")) {
 
     // 3- Compute hash (lower-case hex-encoded SHA-1 digest of the entityID)
     $mdFile = $config["federation"]["localPath"] ."/". sha1($entityId) . ".xml";
-    $logger->addDebug("Requested entity ID: ".$entityId." / mdFile: ".$mdFile);
+    $logger->debug("Requested entity ID: ".$entityId." / mdFile: ".$mdFile);
     // 4- Check if file exists
-    if(!file_exists($mdFile)) {
+    if (!file_exists($mdFile)) {
         http_response_code(404);
         exit("Unknown entityID ".$entityId);
     }
