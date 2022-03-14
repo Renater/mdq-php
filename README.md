@@ -2,6 +2,11 @@
 
 PoC of MDQ server in PHP
 
+## Requirements
+
+PHP 7.2+
+Monolog 2+
+
 ## Quick intro
 
 mqd-php is a simple php app that acts as a MDQ server.
@@ -46,9 +51,6 @@ Here is a sample config:
     <Directory /path/to/mpq-php/www>
         #Options Indexes MultiViews
         Require all granted
-        <FilesMatch \.php$>
-            SetHandler php5-script
-        </FilesMatch>
     </Directory>
 
     # One can have several MD contexts, by setting thos 2 lines several times
