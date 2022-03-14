@@ -43,7 +43,7 @@ Here is a sample config:
     # This one must be present!
     AllowEncodedSlashes NoDecode
 
-    <Directory /path/to/mpq-php>
+    <Directory /path/to/mpq-php/www>
         #Options Indexes MultiViews
         Require all granted
         <FilesMatch \.php$>
@@ -52,7 +52,7 @@ Here is a sample config:
     </Directory>
 
     # One can have several MD contexts, by setting thos 2 lines several times
-    Alias /test /path/to/mpd-php/mdq.php
+    Alias /test /path/to/mpd-php/www/index.php
     SetEnvIf Request_URI ^/test MDQ_CONFIG=/path/to/config.php
 
 </VirtualHost>
