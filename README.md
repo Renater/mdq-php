@@ -55,7 +55,11 @@ Here is a sample config:
 
     # One can have several MD contexts, by setting thos 2 lines several times
     Alias /test /path/to/mpd-php/www/index.php
-    SetEnvIf Request_URI ^/test MDQ_CONFIG=/path/to/config.php
+    SetEnvIf Request_URI ^/test/ MDQ_CONFIG=/path/to/config.php
+    # Sample of a composed federations. URI must begin with "/multi"
+    Alias /multi/fed1+fed2 /path/to/mpd-php/www/index.php
+    SetEnvIf Request_URI ^/multi/fed1\+fed2/ MDQ_CONFIG=/path/to/config-multi.php
+
 
 </VirtualHost>
 ```

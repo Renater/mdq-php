@@ -29,16 +29,37 @@ if (!isset($_SERVER['PATH_INFO']) || !startsWith($_SERVER['PATH_INFO'], "/entiti
     exit('Bad request');
 }
 if (endsWith($_SERVER['PATH_INFO'], "/entities")) {
-    $mdFile = $config["federation"]["localPath"] ."/". $config["federation"]["metadataFile"];
+    if (isset($config["federations"])) {
+        // Full entities list is not supported in composed endpoints
+        http_response_code(501);
+        exit('Not supported');
+    } else {
+        $mdFile = $config["federation"]["localPath"] ."/". $config["federation"]["metadataFile"];
+    }
 } else {
-    $index = strpos($_SERVER['PATH_INFO'], "/entities/");
-    $entityId = urldecode(substr($_SERVER['PATH_INFO'], $index + 10));
+    $entityId = extractEntityID($_SERVER['PATH_INFO']);
 
-    // 3- Compute hash (lower-case hex-encoded SHA-1 digest of the entityID)
-    $mdFile = $config["federation"]["localPath"] ."/". sha1($entityId) . ".xml";
-    $logger->debug("Requested entity ID: ".$entityId." / mdFile: ".$mdFile);
+    $logger->debug("Requested entity ID: ".$entityId." / file: ".sha1($entityId));
+
+    $md_found = false;
+    // 3.1- First look in $config[federations]
+    foreach ($config["federations"] as $fedeName => $fede) {
+        $mdFile = $fede["localPath"] ."/". sha1($entityId) . ".xml";
+        if (file_exists($mdFile)) {
+            $md_found = true;
+            break;
+        }
+    }
+    // 3.2- If not found, look in single fede folder
+    if (!$md_found && isset($config["federation"])) {
+        $mdFile = $config["federation"]["localPath"] ."/". sha1($entityId) . ".xml";
+        if (file_exists($mdFile)) {
+            $md_found = true;
+        }
+    }
+
     // 4- Check if file exists
-    if (!file_exists($mdFile)) {
+    if (!$md_found) {
         http_response_code(404);
         exit("Unknown entityID ".$entityId);
     }

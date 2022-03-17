@@ -1,5 +1,13 @@
 <?php
 
+function extractEntityID($pathInfo)
+{
+    global $logger;
+    $logger->debug("Extracting entityID from ".$pathInfo);
+    $index = strpos($pathInfo, "/entities/");
+    return urldecode(substr($_SERVER['PATH_INFO'], $index + 10));
+}
+
 function endsWith($string, $endString)
 {
     $len = strlen($endString);
@@ -9,30 +17,8 @@ function endsWith($string, $endString)
     return (substr($string, -$len) === $endString);
 }
 
-function startsWith ($string, $startString)
+function startsWith($string, $startString)
 {
     $len = strlen($startString);
     return (substr($string, 0, $len) === $startString);
-}
-
-function do_log($level, $msg)
-{
-    #echo "[".$level."] ".$msg;
-    error_log("[".$level."] ".$msg);
-}
-function debug($msg)
-{
-    do_log("DEBUG", $msg);
-}
-function error($msg)
-{
-    do_log("ERROR", $msg);
-}
-function warn($msg)
-{
-    do_log("WARN", $msg);
-}
-function info($msg)
-{
-    do_log("INFO", $msg);
 }
