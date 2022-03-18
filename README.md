@@ -63,3 +63,8 @@ Here is a sample config:
 
 </VirtualHost>
 ```
+
+## PHP config
+
+Each endpoint needs a PHP script declaring the config, declared with the ''MDQ_CONFIG'' env variable.
+The config is slightly different for a single fed or multi-fed. See examples in ''config/'' folder.
