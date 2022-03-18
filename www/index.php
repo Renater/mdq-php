@@ -47,11 +47,13 @@ if (endsWith($_SERVER['PATH_INFO'], "/entities")) {
         $mdFile = $fede["localPath"] ."/". sha1($entityId) . ".xml";
         if (file_exists($mdFile)) {
             $md_found = true;
+            $federationConfig = $fede;
             break;
         }
     }
     // 3.2- If not found, look in single fede folder
     if (!$md_found && isset($config["federation"])) {
+        $federationConfig = $config["federation"];
         $mdFile = $config["federation"]["localPath"] ."/". sha1($entityId) . ".xml";
         if (file_exists($mdFile)) {
             $md_found = true;
@@ -68,4 +70,11 @@ if (endsWith($_SERVER['PATH_INFO'], "/entities")) {
 
 header('Content-Type: application/samlmetadata+xml');
 http_response_code(200);
-echo file_get_contents($mdFile);
+
+$xml = simplexml_load_file($mdFile);
+
+if (isset($federationConfig["cacheDuration"])) {
+    $xml->addAttribute("cacheDuration", $federationConfig["cacheDuration"]);
+}
+
+echo $xml->asXML();

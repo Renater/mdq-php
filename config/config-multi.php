@@ -14,9 +14,11 @@ $config["logging"] = [
 ];
 $config["federations"]["fed1"] = [
   "name" => "fed1",
-  "localPath" => "/var/cache/shibboleth/fed1"
+  "localPath" => "/var/cache/shibboleth/fed1",
+  "chacheDuration" => "PT1H"
 ];
 $config["federations"]["fed2"] = [
   "name" => "fed2",
-  "localPath" => "/var/cache/shibboleth/fed2"
+  "localPath" => "/var/cache/shibboleth/fed2",
+  "chacheDuration" => "PT2H"
 ];

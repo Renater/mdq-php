@@ -12,5 +12,6 @@ $config["logging"] = [
 $config["federation"] = [
   "name" => "test",
   "localPath" => "/var/cache/shibboleth/test",
+  "chacheDuration" => "PT1H",
   "metadataFile" => "metadata.xml"
 ];
