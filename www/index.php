@@ -16,9 +16,14 @@ if ($_SERVER['REQUEST_METHOD'] != 'GET') {
     exit("Non supported method");
 }
 if ($_SERVER['HTTP_ACCEPT'] != "application/samlmetadata+xml") {
-    $logger->error("Unsupported accept value: ".$_SERVER['HTTP_ACCEPT']);
-    http_response_code(406);
-    exit("Unsupported accept value: ".$_SERVER['HTTP_ACCEPT']);
+    if (isSamlEntity($_SERVER['HTTP_USER_AGENT'])) {
+        $logger->debug("Unsupported accept value: ".$_SERVER['HTTP_ACCEPT']." but SAML entity => ok");
+    } else {
+        $logger->error("Unsupported accept value: ".$_SERVER['HTTP_ACCEPT']);
+        // http_response_code(406);
+        header("Location: /readme");
+        exit("Unsupported accept value: ".$_SERVER['HTTP_ACCEPT']);
+    }
 }
 
 // 2- Decode entityID
