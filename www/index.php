@@ -78,9 +78,15 @@ if (isset($params[3])) {
         $xml->addAttribute("cacheDuration", $federationConfig["cacheDuration"]);
     }
 
+    $etag = '"' . md5($xml->asXML()) . '"';
+    if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $etag) {
+        http_response_code(304);
+        exit();
+    }
+
     header('Content-Type: application/samlmetadata+xml');
-    header('Last-Modified: ' .  gmdate('D, d M Y H:i:s ', filemtime($mdFile)) . 'GMT');
-    header('ETag: "' . md5($xml->asXML()) . '"');
+    header('Last-Modified: ' . gmdate('D, d M Y H:i:s ', filemtime($mdFile)) . 'GMT');
+    header('ETag: ' . $etag);
     http_response_code(200);
     echo $xml->asXML();
 } else {
