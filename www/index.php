@@ -80,27 +80,42 @@ if (isset($entityId)) {
         http_response_code(404);
         exit("Unknown entityID ".$entityId);
     }
+
+    $xml = simplexml_load_file($mdFile);
+
+    if (isset($federationConfig["cacheDuration"])) {
+        $xml->addAttribute("cacheDuration", $federationConfig["cacheDuration"]);
+    }
+
+    header('Content-Type: application/samlmetadata+xml');
+    http_response_code(200);
+    echo $xml->asXML();
 } else {
     // foo+bar/entities
 
-    if (isset($config["federations"])) {
-        // Full entities list is not supported in composed endpoints
-        http_response_code(501);
-        exit('Not supported');
-    } else {
-        $mdFile = $config["federation"]["localPath"] ."/". $config["federation"]["metadataFile"];
+    $doc = new DOMDocument();
+    $doc->loadXML(<<<XML
+<?xml version="1.0" encoding="UTF-8" ?>
+<md:EntitiesDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata">
+</md:EntitiesDescriptor>
+XML
+    );
+    $node = $doc->documentElement;
+
+    foreach (explode("+", $sources) as $source) {
+        if (!isset($config["federations"][$source])) {
+            $logger->error("Unknown source: $source");
+            continue;
+        }
+        foreach(glob($config["federations"][$source]["localPath"] . "/*.xml") as $file) {
+            $entity_doc = new DOMDocument();
+            $entity_doc->load($file);
+            $entity_node = $doc->importNode($entity_doc->documentElement, true);
+            $node->appendChild($entity_node);
+        }
     }
+
+    header('Content-Type: application/samlmetadata+xml');
+    http_response_code(200);
+    echo $doc->saveXML();
 }
-
-// 5- Return the file
-
-header('Content-Type: application/samlmetadata+xml');
-http_response_code(200);
-
-$xml = simplexml_load_file($mdFile);
-
-if (isset($federationConfig["cacheDuration"])) {
-    $xml->addAttribute("cacheDuration", $federationConfig["cacheDuration"]);
-}
-
-echo $xml->asXML();
