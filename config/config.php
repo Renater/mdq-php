@@ -9,9 +9,8 @@ $config["logging"] = [
   "logFile" => "/var/log/mdq-php/mdq-php.log",
   "logLevel" => Monolog\Logger::DEBUG
 ];
-$config["federation"] = [
-  "name" => "test",
-  "localPath" => "/var/cache/shibboleth/test",
+// metadata sources
+$config["federations"]["test"] = [
+  "localPath"     => "/var/cache/shibboleth/test",
   "cacheDuration" => "PT1H",
-  "metadataFile" => "metadata.xml"
 ];

@@ -52,7 +52,7 @@ if (isset($params[3])) {
 
     $md_found = false;
 
-    // 3.1- First look in $config[federations]
+    // Look in each metadata source
     foreach (explode("+", $params[1]) as $source) {
         if (!isset($config["federations"][$source])) {
             $logger->error("Unknown source: $source");
@@ -66,16 +66,7 @@ if (isset($params[3])) {
         }
     }
 
-    // 3.2- If not found, look in single fede folder
-    if (!$md_found && isset($config["federation"])) {
-        $mdFile = $config["federation"]["localPath"] ."/". $file;
-        if (file_exists($mdFile)) {
-            $federationConfig = $config["federation"];
-            $md_found = true;
-        }
-    }
-
-    // 4- Check if file exists
+    // Check if file exists
     if (!$md_found) {
         http_response_code(404);
         exit("Unknown entityID ".$entityId);

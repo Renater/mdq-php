@@ -53,13 +53,15 @@ Here is a sample config:
         Require all granted
     </Directory>
 
-    # One can have several MD contexts, by setting thos 2 lines several times
-    Alias /test /path/to/mpd-php/www/index.php
-    SetEnvIf Request_URI ^/test/ MDQ_CONFIG=/path/to/config.php
-    # Sample of a composed federations. URI must begin with "/multi"
-    Alias /multi/fed1+fed2 /path/to/mpd-php/www/index.php
-    SetEnvIf Request_URI ^/multi/fed1\+fed2/ MDQ_CONFIG=/path/to/config-multi.php
+    # this setup maps all queries to a single instance,
+    # managing multiple metadata sources
+    SetEnv MDQ_CONFIG /path/to/config.php
 
+    DocumentRoot /path/to/mpq-php/www
+
+    RewriteEngine on
+    RewriteCond $1 !^(index\.php)
+    RewriteRule ^(.*)$ /index.php/$1 [L]
 
 </VirtualHost>
 ```
@@ -67,4 +69,3 @@ Here is a sample config:
 ## PHP config
 
 Each endpoint needs a PHP script declaring the config, declared with the ''MDQ_CONFIG'' env variable.
-The config is slightly different for a single fed or multi-fed. See examples in ''config/'' folder.
