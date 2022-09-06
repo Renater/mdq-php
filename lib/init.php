@@ -18,6 +18,7 @@ require_once(__DIR__ . '/../lib/functions.php');
 
 // Config init code
 ini_set('display_errors', $config['debug'] ? '1' : '0');
+ini_set('zlib.output_compression', true);
 
 $formatter = new LineFormatter();
 $formatter->ignoreEmptyContextAndExtra(true);
