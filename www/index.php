@@ -26,41 +26,51 @@ if ($_SERVER['HTTP_ACCEPT'] != "application/samlmetadata+xml") {
     }
 }
 
-// 2- Decode entityID
+// 2- Decode arguments
 
-$logger->debug("Path Info = ".$_SERVER['PATH_INFO']);
-if (!isset($_SERVER['PATH_INFO']) || !startsWith($_SERVER['PATH_INFO'], "/entities")) {
+if (!isset($_SERVER['PATH_INFO'])) {
+    $logger->error("No PATH_INFO provided");
     http_response_code(400);
     exit('Bad request');
 }
-if (endsWith($_SERVER['PATH_INFO'], "/entities")) {
-    if (isset($config["federations"])) {
-        // Full entities list is not supported in composed endpoints
-        http_response_code(501);
-        exit('Not supported');
-    } else {
-        $mdFile = $config["federation"]["localPath"] ."/". $config["federation"]["metadataFile"];
-    }
-} else {
-    $entityId = extractEntityID($_SERVER['PATH_INFO']);
 
-    $logger->debug("Requested entity ID: ".$entityId." / file: ".sha1($entityId));
+$logger->debug("Path Info = ".$_SERVER['PATH_INFO']);
+list($null, $sources, $type, $entityId) = explode("/", $_SERVER['PATH_INFO'], 4);
+
+if ($type != "entities") {
+    $logger->error("Invalid request type: " . $type);
+    http_response_code(400);
+    exit('Bad request');
+}
+
+if (isset($entityId)) {
+    // foo+bar/entities/http://my.entity
+    $entityId = urldecode($entityId);
+    $file  = sha1($entityId) . '.xml';
+
+    $logger->debug("Requested entity ID: ". $entityId . " / file: " . $file);
 
     $md_found = false;
+
     // 3.1- First look in $config[federations]
-    foreach ($config["federations"] as $fedeName => $fede) {
-        $mdFile = $fede["localPath"] ."/". sha1($entityId) . ".xml";
+    foreach (explode("+", $sources) as $source) {
+        if (!isset($config["federations"][$source])) {
+            $logger->error("Unknown source: $source");
+            continue;
+        }
+        $mdFile = $config["federations"][$source]["localPath"] ."/". $file;
         if (file_exists($mdFile)) {
+            $federationConfig = $config["federations"][$source];
             $md_found = true;
-            $federationConfig = $fede;
             break;
         }
     }
+
     // 3.2- If not found, look in single fede folder
     if (!$md_found && isset($config["federation"])) {
-        $federationConfig = $config["federation"];
-        $mdFile = $config["federation"]["localPath"] ."/". sha1($entityId) . ".xml";
+        $mdFile = $config["federation"]["localPath"] ."/". $file;
         if (file_exists($mdFile)) {
+            $federationConfig = $config["federation"];
             $md_found = true;
         }
     }
@@ -70,7 +80,18 @@ if (endsWith($_SERVER['PATH_INFO'], "/entities")) {
         http_response_code(404);
         exit("Unknown entityID ".$entityId);
     }
+} else {
+    // foo+bar/entities
+
+    if (isset($config["federations"])) {
+        // Full entities list is not supported in composed endpoints
+        http_response_code(501);
+        exit('Not supported');
+    } else {
+        $mdFile = $config["federation"]["localPath"] ."/". $config["federation"]["metadataFile"];
+    }
 }
+
 // 5- Return the file
 
 header('Content-Type: application/samlmetadata+xml');

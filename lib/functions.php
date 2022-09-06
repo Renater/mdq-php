@@ -1,13 +1,5 @@
 <?php
 
-function extractEntityID($pathInfo)
-{
-    global $logger;
-    $logger->debug("Extracting entityID from ".$pathInfo);
-    $index = strpos($pathInfo, "/entities/");
-    return urldecode(substr($_SERVER['PATH_INFO'], $index + 10));
-}
-
 function endsWith($string, $endString)
 {
     $len = strlen($endString);
