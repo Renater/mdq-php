@@ -2,6 +2,7 @@
 
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
+use Monolog\Formatter\LineFormatter;
 
 require_once(__DIR__ . '/../vendor/autoload.php');
 #require_once "phar://mdq-php.phar/vendor/autoload.php";
@@ -18,5 +19,11 @@ require_once(__DIR__ . '/../lib/functions.php');
 // Config init code
 ini_set('display_errors', $config['debug'] ? '1' : '0');
 
+$formatter = new LineFormatter();
+$formatter->ignoreEmptyContextAndExtra(true);
+
+$stream = new StreamHandler($config['logging']['logFile'], $config['logging']['logLevel']);
+$stream->setFormatter($formatter);
+
 $logger = new Logger('mdq');
-$logger->pushHandler(new StreamHandler($config['logging']['logFile'], $config['logging']['logLevel']));
+$logger->pushHandler($stream);
