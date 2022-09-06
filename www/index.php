@@ -35,17 +35,17 @@ if (!isset($_SERVER['PATH_INFO'])) {
 }
 
 $logger->debug("Path Info = ".$_SERVER['PATH_INFO']);
-list($null, $sources, $type, $entityId) = explode("/", $_SERVER['PATH_INFO'], 4);
+$params = explode("/", $_SERVER['PATH_INFO'], 4);
 
-if ($type != "entities") {
-    $logger->error("Invalid request type: " . $type);
+if (!isset($params[1]) || !isset($params[2]) || $params[2] != "entities") {
+    $logger->error("Invalid PATH_INFO: " . $_SERVER['PATH_INFO']);
     http_response_code(400);
     exit('Bad request');
 }
 
-if (isset($entityId)) {
+if (isset($params[3])) {
     // foo+bar/entities/http://my.entity
-    $entityId = urldecode($entityId);
+    $entityId = urldecode($params[3]);
     $file  = sha1($entityId) . '.xml';
 
     $logger->debug("Requested entity ID: ". $entityId . " / file: " . $file);
@@ -53,7 +53,7 @@ if (isset($entityId)) {
     $md_found = false;
 
     // 3.1- First look in $config[federations]
-    foreach (explode("+", $sources) as $source) {
+    foreach (explode("+", $params[1]) as $source) {
         if (!isset($config["federations"][$source])) {
             $logger->error("Unknown source: $source");
             continue;
@@ -102,7 +102,7 @@ XML
     );
     $node = $doc->documentElement;
 
-    foreach (explode("+", $sources) as $source) {
+    foreach (explode("+", $params[1]) as $source) {
         if (!isset($config["federations"][$source])) {
             $logger->error("Unknown source: $source");
             continue;
