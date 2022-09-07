@@ -51,6 +51,7 @@ if (isset($params[3])) {
     $logger->debug("Requested entity ID: ". $entityId . " / file: " . $file);
 
     $md_found = false;
+    $cache_duration = '';
 
     // Look in each metadata source
     foreach (explode("+", $params[1]) as $source) {
@@ -60,7 +61,9 @@ if (isset($params[3])) {
         }
         $mdFile = $config["federations"][$source]["localPath"] ."/". $file;
         if (file_exists($mdFile)) {
-            $federationConfig = $config["federations"][$source];
+            if (isset($config["federations"][$source]["cacheDuration"])) {
+                $cache_duration = $config["federations"][$source]["cacheDuration"];
+            }
             $md_found = true;
             break;
         }
@@ -74,8 +77,8 @@ if (isset($params[3])) {
 
     $xml = simplexml_load_file($mdFile);
 
-    if (isset($federationConfig["cacheDuration"])) {
-        $xml->addAttribute("cacheDuration", $federationConfig["cacheDuration"]);
+    if ($cache_duration) {
+        $xml->addAttribute("cacheDuration", $cache_duration);
     }
 
     render($xml->asXML(), filemtime($mdFile));
@@ -92,6 +95,8 @@ XML
     $node = $doc->documentElement;
 
     $last_modified_time = 0;
+    $cache_duration_hours = 24;
+    $cache_duration = 'PT24H';
     foreach (explode("+", $params[1]) as $source) {
         if (!isset($config["federations"][$source])) {
             $logger->error("Unknown source: $source");
@@ -107,7 +112,24 @@ XML
             if ($entity_last_modified_time > $last_modified_time) {
                 $last_modified_time = $entity_last_modified_time;
             }
+
         }
+        if (isset($config["federations"][$source]["cacheDuration"])) {
+            $source_cache_duration = $config["federations"][$source]["cacheDuration"];
+            $source_cache_duration_interval = new DateInterval($source_cache_duration);
+            $source_cache_duration_hours = (int) $source_cache_duration_interval->format("%h");
+        } else {
+            $source_cache_duration = '';
+            $source_cache_duration_hours = 0;
+        }
+        if ($source_cache_duration_hours < $cache_duration_hours) {
+            $cache_duration_hours = $source_cache_duration_hours;
+            $cache_duration = $source_cache_duration;
+        }
+    }
+
+    if ($cache_duration) {
+        $node->setAttribute("cacheDuration", $cache_duration);
     }
 
     render($doc->saveXML(), $last_modified_time);
