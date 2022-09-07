@@ -22,6 +22,7 @@ ini_set('zlib.output_compression', true);
 
 $formatter = new LineFormatter();
 $formatter->ignoreEmptyContextAndExtra(true);
+$formatter->setDateFormat("Y-m-d H:i:s");
 
 $stream = new StreamHandler($config['logging']['logFile'], $config['logging']['logLevel']);
 $stream->setFormatter($formatter);
