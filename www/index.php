@@ -50,7 +50,7 @@ if (isset($params[3])) {
 
     $logger->debug("Requested entity ID: ". $entityId . " / file: " . $file);
 
-    $md_found = false;
+    $metadata_file = '';
     $cache_duration = '';
 
     // Look in each metadata source
@@ -59,29 +59,29 @@ if (isset($params[3])) {
             $logger->error("Unknown source: $source");
             continue;
         }
-        $mdFile = $config["federations"][$source]["localPath"] ."/". $file;
-        if (file_exists($mdFile)) {
+        $path = $config["federations"][$source]["localPath"] ."/". $file;
+        if (file_exists($path)) {
+            $metadata_file = $path;
             if (isset($config["federations"][$source]["cacheDuration"])) {
                 $cache_duration = $config["federations"][$source]["cacheDuration"];
             }
-            $md_found = true;
             break;
         }
     }
 
     // Check if file exists
-    if (!$md_found) {
+    if (!$metadata_file) {
         http_response_code(404);
         exit("Unknown entityID ".$entityId);
     }
 
-    $xml = simplexml_load_file($mdFile);
+    $xml = simplexml_load_file($metadata_file);
 
     if ($cache_duration) {
         $xml->addAttribute("cacheDuration", $cache_duration);
     }
 
-    render($xml->asXML(), filemtime($mdFile));
+    render($xml->asXML(), filemtime($metadata_file));
 } else {
     // foo+bar/entities
 
