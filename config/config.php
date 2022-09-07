@@ -10,7 +10,9 @@ $config["logging"] = [
   "logLevel" => Monolog\Logger::DEBUG
 ];
 // metadata sources
-$config["federations"]["test"] = [
-  "localPath"     => "/var/cache/shibboleth/test",
-  "cacheDuration" => "PT1H",
+$config["federations"] = [
+    "test" => [
+        "localPath"     => "/var/cache/shibboleth/test",
+        "cacheDuration" => "PT1H",
+    ]
 ];
