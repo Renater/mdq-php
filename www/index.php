@@ -21,7 +21,7 @@ if ($_SERVER['HTTP_ACCEPT'] != "application/samlmetadata+xml") {
     } else {
         $logger->error("Unsupported accept value: ".$_SERVER['HTTP_ACCEPT']);
         // http_response_code(406);
-        header("Location: /readme");
+        header("Location: /");
         exit("Unsupported accept value: ".$_SERVER['HTTP_ACCEPT']);
     }
 }
