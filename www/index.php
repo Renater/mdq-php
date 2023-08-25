@@ -73,7 +73,7 @@ if (isset($params[3])) {
         exit("Unknown entityID " . $entityId);
     }
 
-    render($xml->asXML(), filemtime($file));
+    render_file($file);
 } else {
     // foo/entities
     $source = $params[1];
@@ -98,5 +98,5 @@ if (isset($params[3])) {
         exit("Internal error");
     }
 
-    render($xml->asXML(), filemtime($file));
+    render_file($file);
 }
