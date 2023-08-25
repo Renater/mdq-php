@@ -80,7 +80,7 @@ if (isset($params[3])) {
 
     $logger->debug("Requested all entities in source " . $source);
 
-    if (str_contains($source, '+')) {
+    if (strpos($source, '+')) {
         http_response_code(501);
         exit('Unsupported operation');
     }
