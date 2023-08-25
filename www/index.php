@@ -57,7 +57,7 @@ if (isset($params[3])) {
             continue;
         }
 
-        $path = sprintf("%s/%s.xml", $config["federations"][$source]["localPath"], sha1($entityId));
+        $path = sprintf("%s/entities/%s.xml", $config["federations"][$source]["localPath"], sha1($entityId));
         $result = file_exists($path);
         if ($result) {
             $logger->debug(sprintf("Checking %s: found", $path));
