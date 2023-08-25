@@ -50,6 +50,7 @@ if (isset($params[3])) {
 
     $logger->debug("Requested entity ID ". $entityId . " in sources " . $sources);
 
+    $file = null;
     // Look in each metadata source
     foreach (explode("+", $sources) as $source) {
         if (!isset($config["federations"][$source])) {
