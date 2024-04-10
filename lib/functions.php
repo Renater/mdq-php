@@ -63,3 +63,13 @@ function render_file($file)
     http_response_code(200);
     readfile($file);
 }
+
+function get_sha1_id($id) {
+
+    if (preg_match('/^\{sha1\}([0-9a-f]{40})$/', $id, $matches)) {
+        return $matches[1];
+    } else {
+        return sha1($id);
+    }
+
+}
