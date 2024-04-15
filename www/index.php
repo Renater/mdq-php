@@ -41,10 +41,11 @@ if (!isset($params[1]) || !isset($params[2]) || $params[2] != "entities") {
 
 if (isset($params[3])) {
     // foo+bar/entities/http://my.entity
-    $sources  = $params[1];
-    $entityId = urldecode($params[3]);
+    $sources = $params[1];
+    $id      = urldecode($params[3]);
+    $sha1_id = get_sha1_id($id);
 
-    $logger->debug("Requested entity ID ". $entityId . " in sources " . $sources);
+    $logger->debug("Requested entity ID ". $id . " in sources " . $sources);
 
     $file = null;
     // Look in each metadata source
@@ -54,7 +55,7 @@ if (isset($params[3])) {
             continue;
         }
 
-        $path = sprintf("%s/entities/%s.xml", $config["federations"][$source]["localPath"], sha1($entityId));
+        $path = sprintf("%s/entities/%s.xml", $config["federations"][$source]["localPath"], $sha1_id);
         $result = file_exists($path);
         if ($result) {
             $logger->debug(sprintf("Checking %s: found", $path));
@@ -67,7 +68,7 @@ if (isset($params[3])) {
 
     if (!$file) {
         http_response_code(404);
-        exit("Unknown entityID " . $entityId);
+        exit("Unknown entityID " . $id);
     }
 
     render_file($file);
